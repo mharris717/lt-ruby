@@ -171,8 +171,9 @@ class LtWatch
   end
 end
 
-EM.run do
-  EM.connect '127.0.0.1', ARGV[0].to_i, LtClient
-  LtPrinter.safe_print "Connected\n"
+unless defined?(RSpec)
+  EM.run do
+    EM.connect '127.0.0.1', ARGV[0].to_i, LtClient
+    LtPrinter.safe_print "Connected\n"
+  end
 end
-
