@@ -17,7 +17,7 @@ There is also a basic Live Mode/Instarepl that will evaluate lines of code as yo
 
 You'll need the `eventmachine`, `json`, and `method_source` gems installed.
 
-Developed on Mac OS X 10.7 with ruby 2.0.  Seems to work OK with REE 1.8 and ruby 1.9.  I have no clue if it works on other platforms.
+Developed on Mac OSX 10.7 with ruby 2.0.  Seems to work OK with REE 1.8 and ruby 1.9.  I have no clue if it works on other platforms.
 
 ## Usage
 
