@@ -64,7 +64,11 @@ class LtClient < EM::Connection
     if id && cmd
       case cmd
       when "editor.eval.ruby"
-        eval_ruby(id, args)
+        if args['name'] =~ /_spec\.rb$/
+          eval_spec(id,args)
+        else
+          eval_ruby(id, args)
+        end
       when "client.close"
         logger.debug("Disconnecting")
         close_connection
@@ -73,6 +77,9 @@ class LtClient < EM::Connection
     else
       logger.debug "Ignoring invalid input"
     end
+  rescue => exp
+    logger.debug "receive_data error #{exp.message}"
+    raise exp
   end
 
   def send_response(id, cmd, args)
@@ -111,6 +118,17 @@ class LtClient < EM::Connection
   rescue Exception => e
     exception_and_backtrace = [e.inspect, e.backtrace].flatten.join("\n")
     send_response(id, "editor.eval.ruby.exception", {"ex" => exception_and_backtrace, "meta" => response_meta(args["meta"])})
+  end
+
+  def run_shell(cmd)
+    `#{cmd}`
+  end
+
+  def eval_spec(id,args)
+    file = args['path']
+    cmd = "rspec #{file}"
+    result = run_shell(cmd)
+    send_response id, "editor.eval.ruby.result", {"result" => result, "meta" => response_meta(args["meta"])}
   end
 
   def response_meta(request_meta)
