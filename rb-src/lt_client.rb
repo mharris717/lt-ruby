@@ -11,6 +11,8 @@ require 'fileutils'
 LOGFILE = "lt_client.log"
 logger = Logger.new(LOGFILE)
 
+load File.dirname(__FILE__) + "/handle_specs.rb"
+
 logger.debug "Client started with command:"
 logger.debug($0)
 logger.debug(ARGV)
@@ -92,7 +94,6 @@ class LtClient < EM::Connection
 
   def eval_ruby(id, args)
     eval_candidate = self.eval_queue + "\n" + args["code"]
-    logger.debug "Eval Candidate #{eval_candidate}"
     if complete_expression?(eval_candidate)
       eval_args = [eval_candidate]
       if args["path"]
@@ -121,14 +122,12 @@ class LtClient < EM::Connection
   end
 
   def run_shell(cmd)
-    `#{cmd}`
+    `#{cmd} 2>&1`
   end
 
   def eval_spec(id,args)
-    file = args['path']
-    cmd = "rspec #{file}"
-    result = run_shell(cmd)
-    send_response id, "editor.eval.ruby.result", {"result" => result, "meta" => response_meta(args["meta"])}
+    run = HandleSpecs::Run.new(:client => self, :eval_id => id, :args => args)
+    run.result.send_responses!
   end
 
   def response_meta(request_meta)

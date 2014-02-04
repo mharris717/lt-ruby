@@ -30,7 +30,7 @@ shared_context "eval" do
 
   def eval_spec(code, ops={})
     ops[:id] ||= 1
-    client.eval_spec ops[:id], 'code' => code, 'name' => ops[:file], 'path' => ops[:file]
+    client.eval_spec ops[:id], 'code' => code, 'name' => ops[:file], 'path' => (ops[:path]||ops[:file])
   end
 end
 
@@ -56,17 +56,13 @@ describe "eval" do
 
   describe "spec file" do
     it 'basic' do
-      setup_response_mock :result => "fun"
-      client.should_receive(:run_shell).with("rspec main_spec.rb").and_return("fun")
-      eval_spec "a = 42", :file => "main_spec.rb"
+      mock_json = '{"examples": [], "summary_line":"1 examples, 0 failures"}'
+      setup_response_mock :result => "1 examples, 0 failures", :line => 0
+      client.should_receive(:run_shell).with("rspec /fun/tmp_lt_spec.rb -f j").and_return(mock_json)
+      eval_spec "a = 42", :file => "main_spec.rb", :path => "/fun/main_spec.rb"
     end
   end
-
 end
-
-#[291,"editor.eval.ruby",{"line-ending":"\n","name":"scratch.rb","type-name":"Ruby",
-#  "path":"/Users/mharris717/Dropbox/CodeLink/orig/lt-ruby/rb-src/scratch.rb","mime":"text/x-ruby",
-#  "tags":["editor.ruby"],"code":"a = 43","meta":{"start":0,"end":0}}]
 
 describe "receive_data" do
   include_context "eval"
