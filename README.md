@@ -1,4 +1,4 @@
-## Ruby Instarepl for Light Table
+## Ruby Instarepl for Light Table_
 
 This plugin is an alpha implementation of a ruby instarepl for the [Light Table](http://www.lighttable.com) IDE.  On demand, it can evaluate the contents of a ruby file and print the result of the last statement at the bottom.  It can also eval selections of ruby code and print the result next to it.
 
