@@ -1,30 +1,17 @@
 (ns lt.objs.langs.ruby.client
   (:require [lt.object :as object]
-            [lt.objs.eval :as eval]
-            [lt.objs.console :as console]
             [lt.objs.command :as cmd]
-            [lt.objs.clients.tcp :as tcp]
-            [lt.objs.sidebar.clients :as scl]
-            [lt.objs.dialogs :as dialogs]
             [lt.objs.files :as files]
             [lt.objs.popup :as popup]
-            [lt.objs.platform :as platform]
-            [lt.objs.editor :as ed]
-            [lt.objs.editor.pool :as pool]
             [lt.objs.plugins :as plugins]
-            [lt.plugins.watches :as watches]
             [lt.objs.proc :as proc]
-            [clojure.string :as string]
             [lt.objs.clients :as clients]
             [lt.objs.notifos :as notifos]
             [lt.util.load :as load]
-            [crate.binding :refer [bound subatom]]
-            [crate.core :as crate]
-            [lt.util.dom :as dom]
-            [lt.util.cljs :refer [js->clj]])
-  (:require-macros [lt.macros :refer [behavior defui]]))
+            [lt.objs.sidebar.clients :as scl])
+  (:require-macros [lt.macros :refer [behavior]]))
 
-(def plugin-dir "/code/orig/lt-ruby")
+(def plugin-dir (plugins/find-plugin "Ruby Instarepl"))
 (def shell (load/node-module "shelljs"))
 (def rb-path (files/join plugin-dir "rb-src/lt_client.rb"))
 (def runner-path (files/join plugin-dir "rb-src/lt_client_runner.sh"))
@@ -77,8 +64,7 @@
       s))
 
 (defn bash-escape-spaces [s]
-  (clojure.string/replace s " " "\\ ")
-  )
+  (clojure.string/replace s " " "\\ "))
 
 (defn run-rb [{:keys [path project-path name client] :as info}]
   (let [n (notifos/working "Connecting..")
@@ -150,9 +136,26 @@
      :else (run-rb obj))
     obj))
 
+(behavior ::connect
+                  :triggers #{:connect}
+                  :reaction (fn [this path]
+                              (try-connect {:info {:path path}})))
+
 (defn check-all [obj]
   (-> obj
       (check-ruby)
       (check-client)
       (find-project)
       (notify)))
+
+(defn try-connect [{:keys [info]}]
+  (let [path (:path info)
+        client (clients/client! :ruby.client)]
+    (check-all {:path path
+                :client client})
+    client))
+
+(scl/add-connector {:name "Ruby"
+                    :desc "Select a directory to serve as the root of your ruby project."
+                    :connect (fn []
+                               (dialogs/dir ruby :connect))})

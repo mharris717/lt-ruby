@@ -11,7 +11,7 @@
                             :type :path}]
                   :exclusive true
                   :reaction (fn [this exe]
-                              (object/merge! ruby {:lt.objs.langs.ruby/ruby-exe exe})))
+                              (object/merge! ruby {:lt.objs.langs.ruby.client/ruby-exe exe})))
 
 (behavior :lt.objs.langs.ruby/use-rvm
             :triggers #{:object.instant}
@@ -19,7 +19,7 @@
             :type :user
             :exclusive true
             :reaction (fn [this]
-                        (object/merge! ruby {:lt.objs.langs.ruby/use-rvm? true})))
+                        (object/merge! ruby {:lt.objs.langs.ruby.client/use-rvm? true})))
 
 (behavior :lt.objs.langs.ruby/rvm-path
             :triggers #{:object.instant}
@@ -28,7 +28,7 @@
             :params [{:label "path", :type :path}]
             :exclusive true
             :reaction (fn [this path]
-                        (object/merge! ruby {:lt.objs.langs.ruby/rvm-path path})))
+                        (object/merge! ruby {:lt.objs.langs.ruby.client/rvm-path path})))
 
 (behavior :lt.objs.langs.ruby/use-rbenv
             :triggers #{:object.instant}
@@ -36,4 +36,12 @@
             :type :user
             :exclusive true
             :reaction (fn [this]
-                        (object/merge! ruby {:lt.objs.langs.ruby/use-rbenv? true})))
+                        (object/merge! ruby {:lt.objs.langs.ruby.client/use-rbenv? true})))
+
+(behavior :lt.objs.langs.ruby/client-enable-logging
+            :triggers #{:object.instant}
+            :desc "Ruby: log ruby client output to lt_client.log"
+            :type :user
+            :exclusive true
+            :reaction (fn [this]
+                        (object/merge! ruby {:lt.objs.langs.ruby.client/enable-client-logging? true})))

@@ -4,7 +4,9 @@
             [lt.objs.eval :as eval]
             [lt.plugins.watches :as watches]
             [lt.objs.clients :as clients]
-            [lt.objs.notifos :as notifos])
+            [lt.objs.notifos :as notifos]
+            [lt.objs.console :as console]
+            [lt.objs.files :as files])
 
   (:require-macros [lt.macros :refer [behavior]]))
 
@@ -32,6 +34,21 @@
                                            (assoc info :pos pos :code code :meta {:start (:line pos) :end (:line pos)}))]
                                 (object/raise ruby :eval! {:origin editor
                                                              :info info}))))
+
+(behavior ::eval!
+                  :triggers #{:eval!}
+                  :reaction (fn [this event]
+                              (let [{:keys [info origin]} event
+                                    client (-> @origin :client :default)]
+                                (notifos/working "")
+                                (clients/send (eval/get-client! {:command :editor.eval.ruby
+                                                                 :origin origin
+                                                                 :info info
+                                                                 :create try-connect})
+                                              :editor.eval.ruby
+                                              info
+                                              :only
+                                              origin))))
 
 (behavior ::ruby-result
                   :triggers #{:editor.eval.ruby.result}
@@ -62,17 +79,10 @@
                                                                                :start-line (-> ex :meta :start)})
                               ))
 
-(behavior ::eval!
-                  :triggers #{:eval!}
-                  :reaction (fn [this event]
-                              (let [{:keys [info origin]} event
-                                    client (-> @origin :client :default)]
-                                (notifos/working "")
-                                (clients/send (eval/get-client! {:command :editor.eval.ruby
-                                                                 :origin origin
-                                                                 :info info
-                                                                 :create try-connect})
-                                              :editor.eval.ruby
-                                              info
-                                              :only
-                                              origin))))
+(behavior ::ruby-printer
+                  :triggers #{:editor.eval.ruby.print}
+                  :reaction (fn [editor p]
+                              (console/loc-log {:file (files/basename (:file p))
+                                                :line "stdout"
+                                                :content (:msg p)})))
+
