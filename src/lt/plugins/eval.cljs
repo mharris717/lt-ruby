@@ -6,16 +6,19 @@
             [lt.objs.clients :as clients]
             [lt.objs.notifos :as notifos]
             [lt.objs.console :as console]
-            [lt.objs.files :as files])
+            [lt.objs.files :as files]
+            [lt.objs.langs.ruby :as ruby :refer [ruby]])
 
   (:require-macros [lt.macros :refer [behavior]]))
+
+(defn build []
 
 (behavior ::on-eval
                   :triggers #{:eval}
                   :reaction (fn [editor]
                               (object/raise ruby :eval! {:origin editor
                                                              :info (assoc (@editor :info)
-                                                                     :code (watches/watched-range editor nil nil ruby-watch)
+                                                                     :code (watches/watched-range editor nil nil lt.objs.langs.ruby.watch/ruby-watch)
                                                                      :meta {:start 0, :end (ed/last-line editor)})})))
 
 (behavior ::on-eval.one
@@ -23,7 +26,7 @@
                   :reaction (fn [editor]
                               (let [pos (ed/->cursor editor)
                                     code (if (ed/selection? editor)
-                                             (watches/watched-range editor nil nil ruby-watch)
+                                             (watches/watched-range editor nil nil lt.objs.langs.ruby.watch/ruby-watch)
                                              (ed/line editor (:line pos)))
                                     info (:info @editor)
                                     info (if (ed/selection? editor)
@@ -86,3 +89,4 @@
                                                 :line "stdout"
                                                 :content (:msg p)})))
 
+)

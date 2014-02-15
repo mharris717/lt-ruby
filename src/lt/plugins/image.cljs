@@ -3,6 +3,8 @@
 
   (:require-macros [lt.macros :refer [behavior defui]]))
 
+(defn build []
+
 (defui image [src]
   [:img {:src (str "data:image/png;base64," src)}])
 
@@ -16,3 +18,4 @@
                               (object/raise editor :editor.result.underline (image (:image img)) {:line (-> img :meta :end)
                                                                                                   :start-line (-> img :meta :start)})
                               ))
+)

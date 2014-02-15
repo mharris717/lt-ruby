@@ -8,8 +8,13 @@
             [lt.objs.clients :as clients]
             [lt.objs.notifos :as notifos]
             [lt.util.load :as load]
-            [lt.objs.sidebar.clients :as scl])
+            [lt.objs.sidebar.clients :as scl]
+            [lt.objs.dialogs :as dialogs]
+            [lt.objs.langs.ruby :as ruby :refer [ruby]]
+            [lt.objs.clients.tcp :as tcp])
   (:require-macros [lt.macros :refer [behavior]]))
+
+(defn build []
 
 (def plugin-dir (plugins/find-plugin "Ruby Instarepl"))
 (def shell (load/node-module "shelljs"))
@@ -159,3 +164,4 @@
                     :desc "Select a directory to serve as the root of your ruby project."
                     :connect (fn []
                                (dialogs/dir ruby :connect))})
+)

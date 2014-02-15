@@ -7,6 +7,7 @@
 
   (:require-macros [lt.macros :refer [behavior defui]]))
 
+(defn build []
 ;; test if we increased the length of the doc by 1 and have a blank for the last line
 (behavior ::eval-on-change
           :triggers #{:change}
@@ -92,3 +93,4 @@
                           (when-let [ed (pool/last-active)]
                             (object/raise ed :live.toggle!)
                             ))})
+)

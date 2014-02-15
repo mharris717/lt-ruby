@@ -1,6 +1,8 @@
 (ns lt.objs.langs.ruby.watch
   (:require-macros [lt.macros :refer [behavior]]))
 
+(defn build []
+
 (defn ruby-watch [meta src]
   (let [meta-str (str "%q(" (js/JSON.stringify (clj->js meta)) ")")]
     (str "LtWatch.watch(" src ", JSON.parse(" meta-str "))")))
@@ -16,3 +18,4 @@
                               (when-let [watch (get (:watches @editor) (-> res :meta :id))]
                                 (let [str-result (:result res)]
                                   (object/raise (:inline-result watch) :update! str-result)))))
+)
